@@ -1,0 +1,16 @@
+﻿# ROS 2 build artifacts
+build/
+install/
+log/
+.catkin_workspace
+.ami_workspace
+
+# Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Operating system files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,4 @@
+motors:
+  - name: "joint1"
+    node_id: 0
+    max_velocity: 2.0
