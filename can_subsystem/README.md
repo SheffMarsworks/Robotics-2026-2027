@@ -1,4 +1,4 @@
-﻿# CAN Bus Motor Control Subsystem
+# CAN Bus Motor Control Subsystem
 
 This subdirectory houses the centralized Controller Area Network (CAN) communication matrix, node routing infrastructure, and electronic speed controller configurations for the mobile platform.
 
@@ -20,7 +20,7 @@ This subdirectory houses the centralized Controller Area Network (CAN) communica
 - **Host Controller:** Raspberry Pi running an active 64-bit Linux distribution.
 - **Transceiver Layer:** Dedicated MCP2515/Waveshare CAN Hat pinned to the SPI bus interface.
 - **Actuators:** ODrive Brushless Motor Controllers configured with unique CAN Node IDs.
-- **Bus Medium:** Dedicated twisted-pair copper wire carrying differential high (`CAN_H`) and low (`CAN_L`) signals, capped at both physical endpoints with 120Ω parallel termination resistors.
+- **Bus Medium:** Dedicated twisted-pair copper wire carrying differential high (CAN_H) and low (CAN_L) signals, capped at both physical endpoints with 120Ω parallel termination resistors.
 
 ---
 
@@ -28,6 +28,7 @@ This subdirectory houses the centralized Controller Area Network (CAN) communica
 
 ```text
 can_subsystem/
+├── setup_can.sh             # Automated SocketCAN network interface initialization script
 ├── cyclone_config.xml       # Middleware configurations optimizing Eclipse Cyclone DDS profiles
 ├── config/                  # Centralized operational configuration store
 │   └── motors.yaml          # Motor parameter allocation metrics (Baud rates, Node IDs, limits)
@@ -49,7 +50,7 @@ can_subsystem/
 Follow these step-by-step instructions to pull only the necessary files down to your field-deployed Raspberry Pi, bring up the physical network link, and broadcast control targets.
 
 ### 1. Sparse-Clone Only the CAN Subsystem files to the Pi
-To prevent unnecessary storage consumption on the embedded host computer, run a sparse-checkout to pull down **only** the `can_subsystem` architecture from your repository root:
+To prevent unnecessary storage consumption on the embedded host computer, run a sparse-checkout to pull down only the can_subsystem architecture from your repository root:
 
 ```bash
 # Initialize an empty git index on the Raspberry Pi target directory
@@ -69,16 +70,17 @@ git pull origin main
 ```
 
 ### 2. Configure the Linux SocketCAN Device
-The underlying operating system must register the physical hardware transceiver hat as a standard network device socket. Bring up the network link (`can0`) at your target baud rate match (e.g., 250000, 500000, or 1000000 bps):
+Instead of running long manual network link terminal tasks, trigger your automated initialization script to instantly mount your transceiver card interface (can0) at its operational 500kbps bitrate:
 
 ```bash
-sudo ip link set can0 up type can bitrate 500000
-sudo ip link set can0 txqueuelen 1000
+cd ~/robotics_ws/can_subsystem
+chmod +x setup_can.sh
+./setup_can.sh
 ```
-*Verify the active physical driver state by querying: `ifconfig can0` or `ip -details -statistics link show can0`.*
+*To verify the active physical driver state manually, run: ifconfig can0 or ip -details -statistics link show can0.*
 
 ### 3. Automatically Install System Dependencies
-Leverage `rosdep` to parse your `package.xml` entries and automatically download missing prerequisite tools, message models, or hardware extensions:
+Leverage rosdep to parse your package.xml entries and automatically download missing prerequisite tools, message models, or hardware extensions:
 
 ```bash
 cd ~/robotics_ws
@@ -117,7 +119,7 @@ ros2 run can_interface can_node
 ```
 
 ### C. Command Motors & Read Feedback States via ROS 2 Topics
-Your custom package transforms raw CAN data frame registers into clear, readable ROS 2 topics. 
+Your custom package transforms raw CAN data frame registers into clear, readable ROS 2 topics.
 
 - **Monitor Continuous Real-Time Telemetry Data:**
   Open a parallel monitor shell on your Pi or laptop to read incoming velocity, encoder counts, error logs, and temperature arrays streaming back continuously from all active node indices:
