@@ -2,7 +2,7 @@
 
 This subdirectory houses the centralized Controller Area Network (CAN) communication matrix, node routing infrastructure, and electronic speed controller configurations for the mobile platform.
 
-## 📡 Physical Network Topology
+## Physical Network Topology
 
 ```text
   +------------------+          +-------------------+          +-------------------+
@@ -24,7 +24,7 @@ This subdirectory houses the centralized Controller Area Network (CAN) communica
 
 ---
 
-## 📂 Subsystem Workspace Architecture
+## Subsystem Workspace Architecture
 
 ```text
 can_subsystem/
@@ -44,7 +44,7 @@ can_subsystem/
 
 ---
 
-## 🛠️ Remote Target Deployment Execution
+## Remote Target Deployment Execution
 
 Follow these step-by-step instructions to pull only the necessary files down to your field-deployed Raspberry Pi, bring up the physical network link, and broadcast control targets.
 
@@ -95,7 +95,7 @@ colcon build --symlink-install
 
 ---
 
-## 🕹️ System Verification & Functional Execution
+## System Verification & Functional Execution
 
 ### A. Run Local Loopback Validation Tests
 Before spinning up full ROS 2 messaging structures, run your standalone diagnosis pipeline loop directly on the SocketCAN stack to verify hardware transmission channels:
