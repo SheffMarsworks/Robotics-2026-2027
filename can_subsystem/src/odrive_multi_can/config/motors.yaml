@@ -7,6 +7,7 @@ can:
   # can.config.baud_rate on every ODrive.
   command_timeout: 0.5     # s without a new command -> that motor is set to 0
   control_rate: 50.0       # Hz, setpoints re-sent and state published
+  input_mode: vel_ramp     # vel_ramp (smooth, uses ODrive vel_ramp_rate) or passthrough
 
 motors:
   - name: "joint1"

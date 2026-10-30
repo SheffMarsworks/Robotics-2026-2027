@@ -43,7 +43,7 @@ class CanMotorNode(Node):
         if missing:
             self.get_logger().warn(f'No heartbeat from: {missing} (check wiring, node IDs, bitrate)')
 
-        for name, ok in self.mgr.enable_all().items():
+        for name, ok in self.mgr.enable_all(cfg['input_mode']).items():
             if ok:
                 self.get_logger().info(f'{name}: closed loop')
             else:

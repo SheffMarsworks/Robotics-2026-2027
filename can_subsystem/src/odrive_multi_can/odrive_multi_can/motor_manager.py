@@ -107,7 +107,7 @@ class MotorManager(can.Listener):
         with self._lock:
             return [n for n, a in self.axes.items() if not a.online(now)]
 
-    def enable_all(self, input_mode: oc.InputMode = oc.InputMode.PASSTHROUGH,
+    def enable_all(self, input_mode: oc.InputMode = oc.InputMode.VEL_RAMP,
                    timeout: float = 2.0) -> dict[str, bool]:
         """Clears errors, sets velocity mode and requests closed loop on every axis
         at once, then waits for each to report CLOSED_LOOP_CONTROL in its heartbeat.
@@ -201,5 +201,8 @@ def load_config(path: str) -> dict:
         'bustype': can_cfg.get('bustype', 'socketcan'),
         'command_timeout': float(can_cfg.get('command_timeout', 0.5)),
         'control_rate': float(can_cfg.get('control_rate', 50.0)),
+        # vel_ramp: ODrive smooths speed changes using its vel_ramp_rate (recommended)
+        # passthrough: setpoints are applied instantly
+        'input_mode': oc.InputMode[can_cfg.get('input_mode', 'vel_ramp').upper()],
         'motors': motors,
     }

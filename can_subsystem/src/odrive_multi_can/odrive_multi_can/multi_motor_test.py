@@ -15,6 +15,7 @@ import argparse
 import sys
 import time
 
+from odrive_multi_can import odrive_can as oc
 from odrive_multi_can.motor_manager import MotorConfig, MotorManager, load_config
 
 
@@ -33,12 +34,13 @@ def main():
     args = parse_args()
     if args.config:
         cfg = load_config(args.config)
-        motors, interface = cfg['motors'], cfg['interface']
+        motors, interface, input_mode = cfg['motors'], cfg['interface'], cfg['input_mode']
     else:
         nodes = args.nodes or [0]
         motors = [MotorConfig(name=f'node{n}', node_id=n, max_velocity=abs(args.vel))
                   for n in nodes]
         interface = 'can0'
+        input_mode = oc.InputMode.VEL_RAMP
     interface = args.interface or interface
 
     mgr = MotorManager(motors, interface=interface)
@@ -55,7 +57,7 @@ def main():
             return 1
 
         if not args.listen:
-            result = mgr.enable_all()
+            result = mgr.enable_all(input_mode)
             print('Closed loop:', result)
             if not all(result.values()):
                 print('Not every axis entered closed loop. Stopping.')
