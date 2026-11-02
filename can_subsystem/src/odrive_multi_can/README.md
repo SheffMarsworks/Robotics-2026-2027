@@ -120,3 +120,16 @@ These tests run the manager against 6 simulated ODrives on a python-can virtual 
 - `can.config.baud_rate`: same as `setup_can.sh`.
 - Heartbeat and encoder messages at 10 ms. On the S1/Pro: `axis0.config.can.heartbeat_msg_rate_ms = 10`, `encoder_msg_rate_ms = 10`. On the 3.6, `encoder_rate_ms` must be set or no position feedback is sent.
 - Optional second safety layer: enable the ODrive watchdog (`axis0.config.enable_watchdog = True`, `watchdog_timeout = 0.5`). The node re-sends setpoints at 50 Hz, which keeps it fed.
+
+## Suggested next steps (for the owner to decide)
+
+These are proposals only. Nothing below has been done yet.
+
+1. **Motor thermistors.** Wire them and re-enable them on each S1 (they were disabled for bench testing). Without them, the rover can overheat a motor without noticing.
+2. **ODrive watchdog.** Set `axis0.config.enable_watchdog = True` with `watchdog_timeout = 0.5`, so each S1 stops by itself if the host crashes.
+3. **Velocity tuning.** Tune `vel_gain` / `vel_integrator_gain` with the wheels under load. On the bench, speed wobbles about ±0.2 turns/s around the setpoint.
+4. **Calibration over CAN.** Add a `--calibrate` option so all motors can be calibrated from the Pi without USB.
+5. **Error reporting.** Decode ODrive error bits into names (for example `0x200` = DC bus under-voltage) in the node and test output.
+6. **Retire the old node.** Once this is approved, decide whether `can_interface` should be removed or kept, so the two nodes don't publish on the same topics.
+7. **Start on boot.** Add a systemd unit or launch file that brings up `can0` and starts `multi_motor_node`.
+8. **Jetson.** Confirm the CAN hat's interface name and bitrate, update `cyclone_config.xml` IPs, and re-run the test suite plus the 2-motor demo.
