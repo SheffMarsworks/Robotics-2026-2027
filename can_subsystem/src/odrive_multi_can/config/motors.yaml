@@ -3,7 +3,8 @@
 can:
   interface: can0          # can0 on Pi + MCP2515 hat; check `ip link` on the Jetson
   bustype: socketcan
-  # Bitrate is set on the Linux side by setup_can.sh and must equal
+  # bitrate: 500000       # only for USB/serial adapters (bustype seeedstudio etc.)
+  # For socketcan the bitrate is set on the Linux side by setup_can.sh; it must equal
   # can.config.baud_rate on every ODrive.
   command_timeout: 0.5     # s without a new command -> that motor is set to 0
   control_rate: 50.0       # Hz, setpoints re-sent and state published

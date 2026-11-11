@@ -52,7 +52,7 @@ class ODriveAxis:
 class MotorManager(can.Listener):
     def __init__(self, motors: list[MotorConfig], interface: str = 'can0',
                  bustype: str = 'socketcan', command_timeout: float = 0.5,
-                 bus: can.BusABC | None = None):
+                 bus: can.BusABC | None = None, bitrate: int | None = None):
         ids = [m.node_id for m in motors]
         if len(ids) != len(set(ids)):
             raise ValueError(f'Duplicate node_id in motor config: {ids}')
@@ -62,7 +62,10 @@ class MotorManager(can.Listener):
         self.command_timeout = command_timeout
         self._lock = threading.Lock()
 
-        self.bus = bus or can.interface.Bus(channel=interface, interface=bustype)
+        # socketcan gets its bitrate from `ip link`; serial/USB adapters
+        # (e.g. seeedstudio for Waveshare USB-CAN-A) need it passed here.
+        kwargs = {'bitrate': bitrate} if bitrate and bustype != 'socketcan' else {}
+        self.bus = bus or can.interface.Bus(channel=interface, interface=bustype, **kwargs)
         self._notifier = can.Notifier(self.bus, [self])
 
     # ---- receive side (runs on the Notifier thread) ----
@@ -199,6 +202,7 @@ def load_config(path: str) -> dict:
     return {
         'interface': can_cfg.get('interface', 'can0'),
         'bustype': can_cfg.get('bustype', 'socketcan'),
+        'bitrate': int(can_cfg['bitrate']) if can_cfg.get('bitrate') else None,
         'command_timeout': float(can_cfg.get('command_timeout', 0.5)),
         'control_rate': float(can_cfg.get('control_rate', 50.0)),
         # vel_ramp: ODrive smooths speed changes using its vel_ramp_rate (recommended)

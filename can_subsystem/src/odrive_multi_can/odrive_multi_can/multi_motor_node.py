@@ -35,7 +35,7 @@ class CanMotorNode(Node):
             f"Loaded {len(cfg['motors'])} motor(s) from {cfg_path} on {cfg['interface']}")
 
         self.mgr = MotorManager(cfg['motors'], interface=cfg['interface'],
-                                bustype=cfg['bustype'],
+                                bustype=cfg['bustype'], bitrate=cfg['bitrate'],
                                 command_timeout=cfg['command_timeout'])
         self.names = list(self.mgr.axes.keys())
 

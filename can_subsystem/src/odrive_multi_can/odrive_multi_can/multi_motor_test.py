@@ -25,6 +25,9 @@ def parse_args():
     p.add_argument('--bustype', default=None,
                    help='python-can interface (default socketcan; seeedstudio for a '
                         'Waveshare USB-CAN-A on /dev/ttyUSB0)')
+    p.add_argument('--bitrate', type=int, default=None,
+                   help='CAN bitrate for USB/serial adapters (default 500000); '
+                        'for socketcan set it with ip link instead')
     p.add_argument('--nodes', type=int, nargs='+', help='ODrive node IDs (default 0)')
     p.add_argument('--config', help='motors.yaml to use instead of --nodes')
     p.add_argument('--vel', type=float, default=1.0, help='velocity, turns/s')
@@ -38,18 +41,19 @@ def main():
     if args.config:
         cfg = load_config(args.config)
         motors, interface, input_mode = cfg['motors'], cfg['interface'], cfg['input_mode']
-        bustype = cfg['bustype']
+        bustype, bitrate = cfg['bustype'], cfg['bitrate']
     else:
         nodes = args.nodes or [0]
         motors = [MotorConfig(name=f'node{n}', node_id=n, max_velocity=abs(args.vel))
                   for n in nodes]
         interface = 'can0'
-        bustype = 'socketcan'
+        bustype, bitrate = 'socketcan', None
         input_mode = oc.InputMode.VEL_RAMP
     interface = args.interface or interface
     bustype = args.bustype or bustype
+    bitrate = args.bitrate or bitrate
 
-    mgr = MotorManager(motors, interface=interface, bustype=bustype)
+    mgr = MotorManager(motors, interface=interface, bustype=bustype, bitrate=bitrate)
     print(f'Connected to {interface}, motors: {[m.name for m in motors]}')
     try:
         missing = mgr.wait_for_heartbeats()
