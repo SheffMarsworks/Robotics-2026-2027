@@ -1,0 +1,25 @@
+# One entry per ODrive axis on the bus. Add more motors by adding entries.
+# node_id must match <axis>.config.can.node_id on that ODrive and be unique.
+can:
+  interface: can0          # can0 on Pi + MCP2515 hat; check `ip link` on the Jetson
+  bustype: socketcan
+  # bitrate: 500000       # only for USB/serial adapters (bustype seeedstudio etc.)
+  # For socketcan the bitrate is set on the Linux side by setup_can.sh; it must equal
+  # can.config.baud_rate on every ODrive.
+  command_timeout: 0.5     # s without a new command -> that motor is set to 0
+  control_rate: 50.0       # Hz, setpoints re-sent and state published
+  input_mode: vel_ramp     # vel_ramp (smooth, uses ODrive vel_ramp_rate) or passthrough
+
+motors:
+  - name: "joint1"
+    node_id: 0
+    max_velocity: 2.0      # turns/s, commands are clamped to this
+    invert: false          # true flips direction (e.g. left-side wheels)
+
+# Example for a 6-wheel rover (uncomment and set real node IDs):
+#  - {name: "front_left",  node_id: 1, max_velocity: 2.0, invert: true}
+#  - {name: "mid_left",    node_id: 2, max_velocity: 2.0, invert: true}
+#  - {name: "rear_left",   node_id: 3, max_velocity: 2.0, invert: true}
+#  - {name: "front_right", node_id: 4, max_velocity: 2.0, invert: false}
+#  - {name: "mid_right",   node_id: 5, max_velocity: 2.0, invert: false}
+#  - {name: "rear_right",  node_id: 6, max_velocity: 2.0, invert: false}
